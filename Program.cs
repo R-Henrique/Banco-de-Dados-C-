@@ -1,22 +1,13 @@
 ﻿using Microsoft.Data.Sqlite;
-
-var connection = new SqliteConnection("Data Source=database.db");
-connection.Open();
-  
-var command = connection.CreateCommand();
-command.CommandText = @"
-  CREATE TABLE IF NOT EXISTS Computers(
-     id int not null primary key,
-     ram varchat(100) not null,
-     processor varchar(100) not null
-     
-  );
-
- ";
- command.ExecuteNonQuery();
+using LabManager.Database;
+using LabManager.Respositories;
+using LabManager.Models;
 
 
-connection.Close();
+var databaseConfig = new DatabaseConfig();
+new DatabaseSetup(databaseConfig);
+var computerRepository = new ComputerRepository(databaseConfig);
+
 
 //Routing
 var modelName = args[0];
@@ -27,37 +18,19 @@ if(modelName == "Computer")
  if(modelAction == "List")
  {
    Console.WriteLine("Computer List");
-   connection = new SqliteConnection("Data Source=database.db");
-     connection.Open();
-  
-    command = connection.CreateCommand();
-    command.CommandText = "SELECT * FROM Computers";
-  
- 
-     var reader = command.ExecuteReader();
-     while (reader.Read())
-     {
-         Console.WriteLine(
-             "{0},{1},{2}", reader.GetInt32(0), reader.GetString(1), reader.GetString(2));
-     }
-     reader.Close();
-     connection.Close();
+    foreach(var computer in computerRepository.GetAll())
+    {
+      Console.WriteLine("{0},{1},{2}", computer.Id,computer.Ram,computer.Processor);
+    }
  }
+ 
   if(modelAction == "New")
   {
+      Console.WriteLine("Computer New");
       int id = Convert.ToInt32(args[2]);
       var ram = args [3];
       var processor = args [4];
-
-     connection = new SqliteConnection("Data Source=database.db");
-     connection.Open();
-  
-    command = connection.CreateCommand();
-    command.CommandText = @"INSERT INTO Computers VALUES($id, $ram, $processor);";
-    command.Parameters.AddWithValue("$id",id);
-    command.Parameters.AddWithValue("$ram",ram);
-    command.Parameters.AddWithValue("$processor",processor);
- 
-    command.ExecuteNonQuery();
-    connection.Close();
+     
+     var computer = new Computer(id, ram, processor);
+     computerRepository.Save(computer);
   }
