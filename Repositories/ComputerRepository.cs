@@ -59,4 +59,68 @@ class ComputerRepository
         connection.Close();
         return computer;
     }
+    public Computer GetById(int id)
+                var computer = new Computer(id , "FAKE 1", "FAKE 2");
+                var connection = new SqliteConnection(databaseConfig.ConnectionString);
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT * FROM Computers WHERE $id = $id ;
+                command.Parameters.AddWithValue("$id",Id);
+
+                var reader = command.ExecuteReader();
+                reader.Read();
+
+
+                
+                    connection.Close();
+                    return computers;
 }
+
+ public Computer Update(Computer computer)
+    {
+        var connection = new SqliteConnection(databaseConfig.ConnectionString);
+        connection.Open();
+    
+        var command = connection.CreateCommand();
+        command.CommandText = "UPDATE computers SET ram = $ram , processor = $processor WHERE id = $id";
+        command.Parameters.AddWithValue("$id",computer.Id);
+        command.Parameters.AddWithValue("$ram",computer.Ram);
+        command.Parameters.AddWithValue("$processor",computer.Processor);
+    
+        command.ExecuteNonQuery();
+        connection.Close();
+        return computer;
+    }
+    public bool existsBYID(int id)
+    {
+         var connection = new SqliteConnection(databaseConfig.ConnectionString);
+        connection.Open();
+        var command = connection.CreateCommand();
+        command.CommandText = "SELECT count(id) FROM Computers WHERE id = $id";
+        command.Parameters.AddWithValue("$id", id );
+
+        bool result = Convert.ToBoolean(command.ExecuteScalar());
+        return result;
+        
+        if(result == 1)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+        command.ExecuteScalar();
+
+        return result == 1 ;
+    }
+    private Computer readerToComputer(SqliteDataReader reader)
+    {
+        var computer = new Computer{
+            var computer = new Computer(
+                reader.GetInt32(0),
+                reader.GetString(1), 
+                reader.GetString(2));
+            }
+    }
